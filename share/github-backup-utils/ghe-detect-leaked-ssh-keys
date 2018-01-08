@@ -9,7 +9,7 @@
 #/   -s |--snapshot <snapshot-id>   Scan the snapshot with the given id.
 #/                                  Available snapshots may be listed under the data directory.
 #/
-set -e
+set -ex
 
 usage() {
   grep '^#/' < "$0" | cut -c 4-
