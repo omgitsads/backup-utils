@@ -47,7 +47,9 @@ begin_test "ghe-detect-leaked-ssh-keys leaked keys in current backup"
 
   # Inject the fingerprint into the blacklist
   echo 98:d8:99:d3:be:c0:55:05:db:b0:53:2f:1f:ad:b3:60 >> "$SHARED_UTILS_PATH/ghe-ssh-leaked-host-keys-list.txt"
-  export GHE_SNAPSHOT_TIMESTAMP=1
+  cat "$SHARED_UTILS_PATH/ghe-ssh-leaked-host-keys-list.txt"
+
+  #export GHE_SNAPSHOT_TIMESTAMP=1
   ghe-detect-leaked-ssh-keys -s "$GHE_DATA_DIR/1" | grep "Leaked key found in current backup snapshot"
 )
 end_test
@@ -61,9 +63,9 @@ begin_test "ghe-detect-leaked-ssh-keys leaked keys in old snapshot"
 
   # Inject the fingerprint into the blacklist
   echo 98:d8:99:d3:be:c0:55:05:db:b0:53:2f:1f:ad:b3:60 >> "$SHARED_UTILS_PATH/ghe-ssh-leaked-host-keys-list.txt"
-
   cat "$SHARED_UTILS_PATH/ghe-ssh-leaked-host-keys-list.txt"
-  export GHE_SNAPSHOT_TIMESTAMP=2
+
+  #export GHE_SNAPSHOT_TIMESTAMP=2
   output=$(ghe-detect-leaked-ssh-keys -s "$GHE_DATA_DIR/2")
   ! echo $output | grep -q "Leaked key in current backup"
   echo $output | grep -q "One or more older backup snapshots"
