@@ -46,13 +46,8 @@ begin_test "ghe-detect-leaked-ssh-keys leaked keys in current backup"
   tar -cf "$GHE_DATA_DIR/1/ssh-host-keys.tar" --directory="$GHE_DATA_DIR" ssh_host_dsa_key.pub
 
   # Inject the fingerprint into the blacklist.
-  # We use flock as `>>` is not atomic and thus can lead to a race between this
-  # test and the one that follows.
-  (
-    flock -w 3 -x 200
-    echo 98:d8:99:d3:be:c0:55:05:db:b0:53:2f:1f:ad:b3:60 >> "$SHARED_UTILS_PATH/ghe-ssh-leaked-host-keys-list.txt"
-    cat "$SHARED_UTILS_PATH/ghe-ssh-leaked-host-keys-list.txt"
-  ) 200>.ghe-ssh-leaked-host-keys-list.lock
+  echo 98:d8:99:d3:be:c0:55:05:db:b0:53:2f:1f:ad:b3:60 >> "$SHARED_UTILS_PATH/ghe-ssh-leaked-host-keys-list.txt"
+  cat "$SHARED_UTILS_PATH/ghe-ssh-leaked-host-keys-list.txt"
 
   ghe-detect-leaked-ssh-keys -s "$GHE_DATA_DIR/1" | grep "Leaked key found in current backup snapshot"
 )
@@ -66,13 +61,8 @@ begin_test "ghe-detect-leaked-ssh-keys leaked keys in old snapshot"
   tar -cf "$GHE_DATA_DIR/2/ssh-host-keys.tar" --directory="$GHE_DATA_DIR" ssh_host_dsa_key.pub
 
   # Inject the fingerprint into the blacklist.
-  # We use flock as `>>` is not atomic and thus can lead to a race between this
-  # test and the one above.
-  (
-    flock -w 3 -x 200
-    echo 98:d8:99:d3:be:c0:55:05:db:b0:53:2f:1f:ad:b3:60 >> "$SHARED_UTILS_PATH/ghe-ssh-leaked-host-keys-list.txt"
-    cat "$SHARED_UTILS_PATH/ghe-ssh-leaked-host-keys-list.txt"
-  ) 200>.ghe-ssh-leaked-host-keys-list.lock
+  echo 98:d8:99:d3:be:c0:55:05:db:b0:53:2f:1f:ad:b3:60 >> "$SHARED_UTILS_PATH/ghe-ssh-leaked-host-keys-list.txt"
+  cat "$SHARED_UTILS_PATH/ghe-ssh-leaked-host-keys-list.txt"
 
   output=$(ghe-detect-leaked-ssh-keys -s "$GHE_DATA_DIR/2")
   ! echo $output | grep -q "Leaked key in current backup"
