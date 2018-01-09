@@ -45,11 +45,7 @@ begin_test "ghe-detect-leaked-ssh-keys leaked keys in current backup"
   # Add custom key to tar file
   tar -cf "$GHE_DATA_DIR/1/ssh-host-keys.tar" --directory="$GHE_DATA_DIR" ssh_host_dsa_key.pub
 
-  # Inject the fingerprint into the blacklist.
-  echo 98:d8:99:d3:be:c0:55:05:db:b0:53:2f:1f:ad:b3:60 >> "$SHARED_UTILS_PATH/ghe-ssh-leaked-host-keys-list.txt"
-  cat "$SHARED_UTILS_PATH/ghe-ssh-leaked-host-keys-list.txt"
-
-  ghe-detect-leaked-ssh-keys -s "$GHE_DATA_DIR/1" | grep "Leaked key found in current backup snapshot"
+  FINGERPRINT_BLACKLIST="98:d8:99:d3:be:c0:55:05:db:b0:53:2f:1f:ad:b3:60" ghe-detect-leaked-ssh-keys -s "$GHE_DATA_DIR/1" | grep "Leaked key found in current backup snapshot"
 )
 end_test
 
@@ -60,11 +56,7 @@ begin_test "ghe-detect-leaked-ssh-keys leaked keys in old snapshot"
   # Add custom key to tar file in the older snapshot directory
   tar -cf "$GHE_DATA_DIR/2/ssh-host-keys.tar" --directory="$GHE_DATA_DIR" ssh_host_dsa_key.pub
 
-  # Inject the fingerprint into the blacklist.
-  echo 98:d8:99:d3:be:c0:55:05:db:b0:53:2f:1f:ad:b3:60 >> "$SHARED_UTILS_PATH/ghe-ssh-leaked-host-keys-list.txt"
-  cat "$SHARED_UTILS_PATH/ghe-ssh-leaked-host-keys-list.txt"
-
-  output=$(ghe-detect-leaked-ssh-keys -s "$GHE_DATA_DIR/2")
+  output=$(FINGERPRINT_BLACKLIST="98:d8:99:d3:be:c0:55:05:db:b0:53:2f:1f:ad:b3:60" ghe-detect-leaked-ssh-keys -s "$GHE_DATA_DIR/2")
   ! echo $output | grep -q "Leaked key in current backup"
   echo $output | grep -q "One or more older backup snapshots"
 )

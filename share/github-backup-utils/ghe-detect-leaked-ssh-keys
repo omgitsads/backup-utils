@@ -47,7 +47,7 @@ fi
 # Bring in the backup configuration
 . $( dirname "${BASH_SOURCE[0]}" )/ghe-backup-config
 
-fingerprint_blacklist="$GHE_BACKUP_ROOT/share/github-backup-utils/ghe-ssh-leaked-host-keys-list.txt"
+FINGERPRINT_BLACKLIST="${FINGERPRINT_BLACKLIST:-$(cat "$GHE_BACKUP_ROOT/share/github-backup-utils/ghe-ssh-leaked-host-keys-list.txt")}"
 
 keys="ssh_host_dsa_key.pub ssh_host_ecdsa_key.pub ssh_host_ed25519_key.pub ssh_host_rsa_key.pub"
 
@@ -78,7 +78,7 @@ for tar_file in $ssh_tars; do
       else
         fingerprint=$(ssh-keygen -lf $TEMPDIR/$key | cut -d ' ' -f 2)
       fi
-      if grep -q "$fingerprint" $fingerprint_blacklist; then
+      if echo "$FINGERPRINT_BLACKLIST" | grep -q "$fingerprint"; then
         leaked_keys_found=true
         if [ "$current_dir" == $(dirname "$tar_file") ]; then
           current_bkup=true
